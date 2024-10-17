@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Andrew Lampinen, modified by Janna Wennberg and then Seyi Lawal">
+<meta name="dcterms.date" content="2024-10-15">
+
+<title>Psych201a, Problem Set 2: Tidying Data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="ps2-Lawal_files/libs/clipboard/clipboard.min.js"></script>
+<script src="ps2-Lawal_files/libs/quarto-html/quarto.js"></script>
+<script src="ps2-Lawal_files/libs/quarto-html/popper.min.js"></script>
+<script src="ps2-Lawal_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="ps2-Lawal_files/libs/quarto-html/anchor.min.js"></script>
+<link href="ps2-Lawal_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="ps2-Lawal_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="ps2-Lawal_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="ps2-Lawal_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="ps2-Lawal_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#load-data" id="toc-load-data" class="nav-link active" data-scroll-target="#load-data">Load Data</a></li>
+  <li><a href="#cleaning-up-a-bit" id="toc-cleaning-up-a-bit" class="nav-link" data-scroll-target="#cleaning-up-a-bit">cleaning up a bit</a>
+  <ul class="collapse">
+  <li><a href="#filter-out-excluded-rows" id="toc-filter-out-excluded-rows" class="nav-link" data-scroll-target="#filter-out-excluded-rows">filter out excluded rows</a></li>
+  <li><a href="#get-rid-of-unnecessary-columns" id="toc-get-rid-of-unnecessary-columns" class="nav-link" data-scroll-target="#get-rid-of-unnecessary-columns">Get rid of unnecessary columns</a></li>
+  </ul></li>
+  <li><a href="#converting-to-long-form" id="toc-converting-to-long-form" class="nav-link" data-scroll-target="#converting-to-long-form">Converting to long form</a></li>
+  <li><a href="#splitting-columns" id="toc-splitting-columns" class="nav-link" data-scroll-target="#splitting-columns">Splitting columns</a></li>
+  <li><a href="#groups-summaries-and-results" id="toc-groups-summaries-and-results" class="nav-link" data-scroll-target="#groups-summaries-and-results">Groups, Summaries, and Results</a>
+  <ul class="collapse">
+  <li><a href="#performance-hypothesis" id="toc-performance-hypothesis" class="nav-link" data-scroll-target="#performance-hypothesis">Performance Hypothesis</a></li>
+  <li><a href="#rating-hypothesis" id="toc-rating-hypothesis" class="nav-link" data-scroll-target="#rating-hypothesis">Rating Hypothesis</a></li>
+  <li><a href="#performance-hypothesis-continued" id="toc-performance-hypothesis-continued" class="nav-link" data-scroll-target="#performance-hypothesis-continued">Performance Hypothesis (Continued)</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Psych201a, Problem Set 2: Tidying Data</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Andrew Lampinen, modified by Janna Wennberg and then Seyi Lawal </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 15, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>In this assignment we’ll learn about <code>dplyr</code> and <code>tidyr</code>, two packages from the <code>tidyverse</code> that allow elegant and easily understandable data tidying and manipulation. We’ll do this by working through the steps of loading an actual dataset, tidying it up, and carrying out some basic analyses.</p>
+<p>The dataset we’re using comes from the OSF Reproduciblity project replication of a study by Maya Tamir, Christopher Mitchell, and James Gross (“Hedonic and Instrumental Motives in Anger Regulation,” Tamir, Mitchell, and Gross, Psychological Science, 2008). You can find the replication report <a href="https://osf.io/7i2tf/">here</a>, and the original paper <a href="https://www2.bc.edu/maya-tamir/download/Tamir_et_al_PS_2008.pdf">here</a>. The replication tests two hypotheses from the original paper:</p>
+<ol type="1">
+<li><p>Rating hypothesis: Participants will prefer listening to angry music (or recalling an anger-inducing experience) before playing a confrontational (violent) game, but will prefer listening to exciting or neutral music (or recalling a calm experience) before a neutral game. This is assessed through preference ratings where the participants read a description of a game, and then are asked to rate on a likert scale.</p></li>
+<li><p>Performance hypothesis: Subjects would perform better after listening to angry music on a confrontational game (not one of the ones described in the materials for the previous hypothesis, to avoid contamination), but would perform better on a non-confrontational game (again, not described in the materials for hypothesis 1) after listening to non-angry music. This is computed by having the subjects play without music for 5 minutes, and then after/with music for 5 minutes, and comparing change scores depending on the music type.</p></li>
+</ol>
+<p>First, let’s load the libraries we’re going to use.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(foreign) <span class="co"># for reading spss formatted data</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr) <span class="co"># useful for some string manipulation</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="load-data" class="level1">
+<h1>Load Data</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">=</span> <span class="fu">read.spss</span>(<span class="st">"data/Tamiretal2008ReplicationData.sav"</span>, <span class="at">to.data.frame=</span>T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Take a look at the data structure:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Subject Cond                                                    Exper
+1       1    2 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part1.exp
+2       2    3 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part1.exp
+3       3    1 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part1.exp
+4       4    4 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part1.exp
+5       5    5 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part1.exp
+6       6    6 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part1.exp
+      Inifile        Date  Time Game1Angry1 Game1Angry2 Game1Angry3
+1 default.mlp 13642819200 40781           6           6           5
+2 default.mlp 13642819200 50753           7           7           7
+3 default.mlp 13642819200 54540           6           5           7
+4 default.mlp 13642905600 34952           4           1           1
+5 default.mlp 13642905600 49095           6           6           7
+6 default.mlp 13642905600 59714           5           5           6
+  Game1AngryFriends Game1AngryStrangers Game1CalmFriends Game1CalmStrangers
+1                 2                   5                2                  2
+2                 7                   7                6                  6
+3                 2                   2                2                  2
+4                 6                   6                2                  1
+5                 6                   6                2                  2
+6                 3                   4                5                  4
+  Game1ExcitedFriends Game1ExcitedStrangers Game1Exciting1 Game1Exciting2
+1                   1                     2              3              2
+2                   6                     6              5              3
+3                   2                     2              2              3
+4                   3                     4              5              4
+5                   5                     5              1              3
+6                   6                     4              3              2
+  Game1Exciting3 Game1Intro Game1Neutral1 Game1Neutral2 Game1Neutral3
+1              6         ok             2             4             4
+2              2         ok             1             1             1
+3              4         ok             1             2             3
+4              5         ok             1             2             2
+5              2         ok             3             2             4
+6              4         ok             2             2             4
+  Game2Angry1 Game2Angry2 Game2Angry3 Game2AngryFriends Game2AngryStrangers
+1           6           4           6                 3                   6
+2           7           6           7                 6                   7
+3           5           3           6                 3                   3
+4           6           2           6                 3                   6
+5           5           6           6                 5                   6
+6           6           5           6                 3                   5
+  Game2CalmFriends Game2CalmStrangers Game2ExcitedFriends Game2ExcitedStrangers
+1                1                  2                   1                     1
+2                2                  3                   5                     5
+3                3                  3                   3                     3
+4                1                  1                   2                     4
+5                1                  1                   4                     4
+6                3                  2                   5                     4
+  Game2Exciting1 Game2Exciting2 Game2Exciting3 Game2Intro Game2Neutral1
+1              3              2              4         ok             1
+2              5              2              1         ok             1
+3              2              5              2         ok             4
+4              3              2              2         ok             1
+5              1              2              2         ok             4
+6              2              2              3         ok             2
+  Game2Neutral2 Game2Neutral3 Game3Angry1 Game3Angry2 Game3Angry3
+1             3             1           2           2           3
+2             1             2           6           3           5
+3             3             1           2           2           3
+4             1             3           2           1           6
+5             4             5           3           5           6
+6             3             4           2           2           5
+  Game3AngryFriends Game3AngryStrangers Game3CalmFriends Game3CalmStrangers
+1                 3                   2                7                  6
+2                 3                   2                6                  5
+3                 4                   4                3                  3
+4                 5                   4                2                  2
+5                 1                   3                5                  5
+6                 1                   1                4                  3
+  Game3ExcitedFriends Game3ExcitedStrangers Game3Exciting1 Game3Exciting2
+1                   6                     5              2              2
+2                   6                     5              4              3
+3                   4                     4              3              6
+4                   5                     6              3              1
+5                   6                     5              3              1
+6                   4                     2              1              2
+  Game3Exciting3 Game3Intro Game3Neutral1 Game3Neutral2 Game3Neutral3
+1              3         ok             5             6             5
+2              3         ok             2             1             5
+3              2         ok             2             3             3
+4              3         ok             2             2             6
+5              3         ok             2             4             5
+6              2         ok             5             4             4
+  Game4Angry1 Game4Angry2 Game4Angry3 Game4AngryFriends Game4AngryStrangers
+1           2           2           2                 2                   2
+2           2           5           2                 4                   4
+3           5           2           2                 4                   5
+4           1           1           2                 1                   1
+5           3           4           3                 2                   3
+6           2           3           3                 1                   2
+  Game4CalmFriends Game4CalmStrangers Game4ExcitedFriends Game4ExcitedStrangers
+1                5                  5                   7                     4
+2                2                  4                   3                     4
+3                2                  4                   4                     5
+4                2                  2                   4                     4
+5                5                  5                   5                     6
+6                4                  4                   5                     4
+  Game4Exciting1 Game4Exciting2 Game4Exciting3 Game4Intro Game4Neutral1
+1              5              5              2         ok             1
+2              1              2              6         ok             5
+3              7              4              5         ok             3
+4              6              6              6         ok             4
+5              1              5              5         ok             4
+6              2              4              3         ok             3
+  Game4Neutral2 Game4Neutral3 MusicSelectionEnd MusicSelectionInstrx
+1             5             2                ok                   ok
+2             5             2                ok                   ok
+3             2             4                ok                   ok
+4             5             2                ok                   ok
+5             2             5                ok                   ok
+6             5             5                ok                   ok
+  RecallSelectionEnd RecallSelectionInstrx Subject2 Cond2
+1                 ok                    ok        1     2
+2                 ok                    ok        2     3
+3                 ok                    ok        3     1
+4                 ok                    ok        4     4
+5                 ok                    ok        5     5
+6                 ok                    ok        6     6
+                                                   Exper_A   Inifile_A
+1 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part2.exp default.mlp
+2 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part2.exp default.mlp
+3 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part2.exp default.mlp
+4 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part2.exp default.mlp
+5 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part2.exp default.mlp
+6 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part2.exp default.mlp
+       Date_A Time_A DescribeMusic HowActiveAngry1 HowActiveAngry2
+1 13642819200  43151             2               4               4
+2 13642819200  53012             3               5               5
+3 13642819200  57041             2               4               4
+4 13642905600  37630             3               5               3
+5 13642905600  51434             2               5               4
+6 13642905600  62320             3               3               3
+  HowActiveAngry3 HowActiveExciting1 HowActiveExciting2 HowActiveExciting3
+1               4                  5                  4                  5
+2               5                  5                  2                  4
+3               4                  2                  1                  3
+4               3                  5                  5                  5
+5               5                  3                  3                  3
+6               2                  3                  3                  4
+  HowActiveNeutral1 HowActiveNeutral2 HowActiveNeutral3 HowAngryAngry1
+1                 2                 2                 2              5
+2                 2                 2                 1              5
+3                 1                 2                 1              4
+4                 2                 2                 1              3
+5                 2                 1                 1              2
+6                 1                 2                 1              2
+  HowAngryAngry2 HowAngryAngry3 HowAngryExciting1 HowAngryExciting2
+1              4              4                 3                 4
+2              5              5                 4                 3
+3              4              4                 3                 1
+4              2              3                 1                 1
+5              2              3                 2                 2
+6              2              2                 2                 1
+  HowAngryExciting3 HowAngryNeutral1 HowAngryNeutral2 HowAngryNeutral3
+1                 3                2                2                1
+2                 3                2                1                1
+3                 3                1                1                2
+4                 1                2                1                1
+5                 1                1                1                1
+6                 1                1                1                1
+  HowExcitedAngry1 HowExcitedAngry2 HowExcitedAngry3 HowExcitedExciting1
+1                4                3                3                   4
+2                5                5                5                   4
+3                3                3                2                   2
+4                4                1                3                   4
+5                4                4                5                   3
+6                5                2                3                   3
+  HowExcitedExciting2 HowExcitedExciting3 HowExcitedNeutral1 HowExcitedNeutral2
+1                   4                   4                  2                  2
+2                   2                   4                  3                  2
+3                   2                   3                  2                  1
+4                   3                   5                  2                  2
+5                   3                   3                  2                  1
+6                   2                   4                  1                  1
+  HowExcitedNeutral3 HowPleasantAngry1 HowPleasantAngry2 HowPleasantAngry3
+1                  2                 1                 2                 1
+2                  1                 1                 2                 1
+3                  2                 2                 2                 4
+4                  1                 1                 1                 3
+5                  3                 4                 3                 2
+6                  2                 2                 2                 3
+  HowPleasantExciting1 HowPleasantExciting2 HowPleasantExciting3
+1                    2                    2                    1
+2                    1                    4                    3
+3                    2                    2                    2
+4                    4                    4                    3
+5                    1                    1                    2
+6                    3                    3                    4
+  HowPleasantNeutral1 HowPleasantNeutral2 HowPleasantNeutral3 MusicRatingEnd
+1                   5                   4                   5             ok
+2                   4                   4                   4             ok
+3                   2                   2                   1             ok
+4                   2                   4                   5             ok
+5                   1                   1                   5             ok
+6                   3                   3                   4             ok
+  MusicRatingInstrx WhichGames aboutyou age distractions endinstructions
+1                ok         ok       ok  18           ok              ok
+2                ok         ok       ok  20           ok              ok
+3                ok         ok       ok  18           ok              ok
+4                ok         ok       ok  18           ok              ok
+5                ok         ok       ok  18           ok              ok
+6                ok         ok       ok  19           ok              ok
+  ethnicity overlooking race sex whatabout year Subject3 DDNoMusicLevel
+1         2          ok    2   1        ok    1        1              3
+2         2          ok    2   2        ok    2        2              3
+3         2          ok    2   1        ok    1        3              2
+4         2          ok    2   1        ok    1        4              3
+5         2          ok    2   1        ok    1        5              3
+6         2          ok    2   1        ok    1        6              3
+  DDNoMusicScore DDMusicLevel DDMusicScore SOFNoMusicEnemies
+1              0            3          830                22
+2             20            3         2930                18
+3           1250            3          370                15
+4           1742            3         1921                 3
+5             60            3         1750                18
+6            840            3         1380                23
+  SOFNoMusicFriendlies SOFNoMusicTime SOFMusicEnemies SOFMusicFriendlies
+1                    2          24360              19                  0
+2                    1          23580              18                  2
+3                    0          15300              23                  1
+4                    0           5280              19                  0
+5                    2          19140              23                  3
+6                    1          23220              24                  0
+  SOFMusicTime                           GameComments
+1        23340                                       
+2        22500                                       
+3        24300                                       
+4        16860 Participant died, restart             
+5        20820 Error in game towards the end of time 
+6        23400                                       
+  DoNotUseVideoGamePerformanceData ConfrontationalAngryMusicScore
+1                               NA                       5.500000
+2                               NA                       6.833333
+3                               NA                       5.333333
+4                                1                       3.333333
+5                                1                       6.000000
+6                               NA                       5.500000
+  ConfrontationalExcitingMusicScore ConfrontationalNeutralMusicScore
+1                          3.333333                         2.500000
+2                          3.000000                         1.166667
+3                          3.000000                         2.333333
+4                          3.500000                         1.666667
+5                          1.833333                         3.666667
+6                          2.666667                         2.833333
+  ConfrontationalAngryRecallScore ConfrontationalExcitingRecallScore
+1                            3.75                               1.25
+2                            7.00                               5.75
+3                            2.25                               2.25
+4                            6.00                               3.50
+5                            6.00                               4.75
+6                            3.75                               5.00
+  ConfrontationalNeutralRecallScore NonconfrontationalAngryMusicScore
+1                              2.00                          2.166667
+2                              5.25                          3.833333
+3                              2.25                          2.666667
+4                              1.50                          2.166667
+5                              1.75                          4.000000
+6                              4.00                          2.833333
+  NonconfrontationalExcitingMusicScore NonconfrontationalNeutralMusicScore
+1                             3.166667                            4.000000
+2                             3.166667                            3.333333
+3                             4.500000                            2.833333
+4                             4.166667                            3.500000
+5                             3.000000                            3.666667
+6                             2.333333                            4.333333
+  NonconfrontationalAngryRecallScore NonconfrontationalExcitingRecallScore
+1                               2.50                                  5.25
+2                               3.00                                  5.25
+3                               4.25                                  4.25
+4                               3.75                                  5.00
+5                               2.00                                  5.75
+6                               1.25                                  3.50
+  NonconfrontationalNeutralRecallScore ConfrontationalAngerScore
+1                                 6.25                       4.8
+2                                 5.25                       6.9
+3                                 3.25                       4.1
+4                                 2.00                       4.4
+5                                 5.00                       6.0
+6                                 3.75                       4.8
+  ConfrontationalExcitingScore ConfrontationalNeutralScore
+1                          2.5                         2.3
+2                          4.1                         2.8
+3                          2.7                         2.3
+4                          3.5                         1.6
+5                          3.0                         2.9
+6                          3.6                         3.3
+  NonconfrontationalAngerScore NonconfrontationalExcitingScore
+1                          2.3                             4.0
+2                          3.5                             4.0
+3                          3.3                             4.4
+4                          2.8                             4.5
+5                          3.2                             4.1
+6                          2.2                             2.8
+  NonconfrontationalNeutralScore Usable DoNotUse
+1                            4.9      1       NA
+2                            4.1      0        1
+3                            3.0      1       NA
+4                            2.9      1       NA
+5                            4.2      1       NA
+6                            4.1      1       NA
+                                                                                                                                                                                            ProblemDetails
+1                                                                                                                                                                                                         
+2 Female participant (this is a males only study)                                                                                                                                                         
+3                                                                                                                                                                                                         
+4                                                                                                                                                                                                         
+5                                                                                                                                                                                                         
+6                                                                                                                                                                                                         
+  DinerDashWithMusicScore DinerDashWithoutMusicScore MusicCondition
+1                    5830                       5000       Exciting
+2                    7930                       5020        Neutral
+3                    5370                       1250          Anger
+4                    6921                       6742          Anger
+5                    6750                       5060       Exciting
+6                    6380                       5840        Neutral
+  ZDinerDashWithMusicScore ZDinerDashWithoutMusicScore ZSOFNoMusicEnemies
+1              -0.07333283                   0.2692740          0.7501199
+2                       NA                          NA                 NA
+3              -0.73344247                  -2.8616517         -0.1401958
+4               1.49227504                   1.7236934         -1.6664514
+5               1.24688645                   0.3193688          0.2413681
+6               0.71592870                   0.9706014          0.8773079
+  ZSOFMusicEnemies DinerDashDifferenceScore SOFDifferenceScore
+1       -0.2020329               -0.3426068        -0.95215278
+2               NA                       NA                 NA
+3        0.3183548                2.1282092         0.45855062
+4       -0.2020329               -0.2314183         1.46441854
+5        0.3183548                0.9275176         0.07698673
+6        0.4484517               -0.2546727        -0.42885618
+  PleasantScoreForAngryMusic PleasantScoreForExcitingMusic
+1                   1.333333                      1.666667
+2                   1.333333                      2.666667
+3                   2.666667                      2.000000
+4                   1.666667                      3.666667
+5                   3.000000                      1.333333
+6                   2.333333                      3.333333
+  PleasantScoreForNeutralMusic AngryScoreForAngryMusic
+1                     4.666667                4.333333
+2                     4.000000                5.000000
+3                     1.666667                4.000000
+4                     3.666667                2.666667
+5                     2.333333                2.333333
+6                     3.333333                2.000000
+  AngryScoreForExcitingMusic AngryScoreForNeutralMusic
+1                   3.333333                  1.666667
+2                   3.333333                  1.333333
+3                   2.333333                  1.333333
+4                   1.000000                  1.333333
+5                   1.666667                  1.000000
+6                   1.333333                  1.000000
+  ExcitedScoreForExcitingMusic ExcitedScoreForNeutralMusic
+1                     4.000000                    2.000000
+2                     3.333333                    2.000000
+3                     2.333333                    1.666667
+4                     4.000000                    1.666667
+5                     3.000000                    2.000000
+6                     3.000000                    1.333333
+  ActiveScoreForExcitingMusic ActiveScoreForNeutralMusic
+1                    4.666667                   2.000000
+2                    3.666667                   1.666667
+3                    2.000000                   1.333333
+4                    5.000000                   1.666667
+5                    3.000000                   1.333333
+6                    3.333333                   1.333333
+  ExcitedScoreForAngryMusic ActiveScoreForAngryMusic
+1                  3.333333                 4.000000
+2                  5.000000                 5.000000
+3                  2.666667                 4.000000
+4                  2.666667                 3.666667
+5                  4.333333                 4.666667
+6                  3.333333                 2.666667</code></pre>
+</div>
+</div>
+<p>This data is what we call <strong>wide form</strong> – each subject is a single row, and the columns represent different observations. This is a somewhat inconvenient way of representing the data, for example if we wanted to do the same operation to each likert rating (for example normalize it to be in the range 0-1), we’d have to do it on each of the 40 or so rating columns. To avoid this, our eventual goal will be to convert the data into <strong>long form</strong>, where each row is a single observation.</p>
+<p>For now, take a look at the column names to get a better idea of what all is in the dataset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] "Subject"                              
+  [2] "Cond"                                 
+  [3] "Exper"                                
+  [4] "Inifile"                              
+  [5] "Date"                                 
+  [6] "Time"                                 
+  [7] "Game1Angry1"                          
+  [8] "Game1Angry2"                          
+  [9] "Game1Angry3"                          
+ [10] "Game1AngryFriends"                    
+ [11] "Game1AngryStrangers"                  
+ [12] "Game1CalmFriends"                     
+ [13] "Game1CalmStrangers"                   
+ [14] "Game1ExcitedFriends"                  
+ [15] "Game1ExcitedStrangers"                
+ [16] "Game1Exciting1"                       
+ [17] "Game1Exciting2"                       
+ [18] "Game1Exciting3"                       
+ [19] "Game1Intro"                           
+ [20] "Game1Neutral1"                        
+ [21] "Game1Neutral2"                        
+ [22] "Game1Neutral3"                        
+ [23] "Game2Angry1"                          
+ [24] "Game2Angry2"                          
+ [25] "Game2Angry3"                          
+ [26] "Game2AngryFriends"                    
+ [27] "Game2AngryStrangers"                  
+ [28] "Game2CalmFriends"                     
+ [29] "Game2CalmStrangers"                   
+ [30] "Game2ExcitedFriends"                  
+ [31] "Game2ExcitedStrangers"                
+ [32] "Game2Exciting1"                       
+ [33] "Game2Exciting2"                       
+ [34] "Game2Exciting3"                       
+ [35] "Game2Intro"                           
+ [36] "Game2Neutral1"                        
+ [37] "Game2Neutral2"                        
+ [38] "Game2Neutral3"                        
+ [39] "Game3Angry1"                          
+ [40] "Game3Angry2"                          
+ [41] "Game3Angry3"                          
+ [42] "Game3AngryFriends"                    
+ [43] "Game3AngryStrangers"                  
+ [44] "Game3CalmFriends"                     
+ [45] "Game3CalmStrangers"                   
+ [46] "Game3ExcitedFriends"                  
+ [47] "Game3ExcitedStrangers"                
+ [48] "Game3Exciting1"                       
+ [49] "Game3Exciting2"                       
+ [50] "Game3Exciting3"                       
+ [51] "Game3Intro"                           
+ [52] "Game3Neutral1"                        
+ [53] "Game3Neutral2"                        
+ [54] "Game3Neutral3"                        
+ [55] "Game4Angry1"                          
+ [56] "Game4Angry2"                          
+ [57] "Game4Angry3"                          
+ [58] "Game4AngryFriends"                    
+ [59] "Game4AngryStrangers"                  
+ [60] "Game4CalmFriends"                     
+ [61] "Game4CalmStrangers"                   
+ [62] "Game4ExcitedFriends"                  
+ [63] "Game4ExcitedStrangers"                
+ [64] "Game4Exciting1"                       
+ [65] "Game4Exciting2"                       
+ [66] "Game4Exciting3"                       
+ [67] "Game4Intro"                           
+ [68] "Game4Neutral1"                        
+ [69] "Game4Neutral2"                        
+ [70] "Game4Neutral3"                        
+ [71] "MusicSelectionEnd"                    
+ [72] "MusicSelectionInstrx"                 
+ [73] "RecallSelectionEnd"                   
+ [74] "RecallSelectionInstrx"                
+ [75] "Subject2"                             
+ [76] "Cond2"                                
+ [77] "Exper_A"                              
+ [78] "Inifile_A"                            
+ [79] "Date_A"                               
+ [80] "Time_A"                               
+ [81] "DescribeMusic"                        
+ [82] "HowActiveAngry1"                      
+ [83] "HowActiveAngry2"                      
+ [84] "HowActiveAngry3"                      
+ [85] "HowActiveExciting1"                   
+ [86] "HowActiveExciting2"                   
+ [87] "HowActiveExciting3"                   
+ [88] "HowActiveNeutral1"                    
+ [89] "HowActiveNeutral2"                    
+ [90] "HowActiveNeutral3"                    
+ [91] "HowAngryAngry1"                       
+ [92] "HowAngryAngry2"                       
+ [93] "HowAngryAngry3"                       
+ [94] "HowAngryExciting1"                    
+ [95] "HowAngryExciting2"                    
+ [96] "HowAngryExciting3"                    
+ [97] "HowAngryNeutral1"                     
+ [98] "HowAngryNeutral2"                     
+ [99] "HowAngryNeutral3"                     
+[100] "HowExcitedAngry1"                     
+[101] "HowExcitedAngry2"                     
+[102] "HowExcitedAngry3"                     
+[103] "HowExcitedExciting1"                  
+[104] "HowExcitedExciting2"                  
+[105] "HowExcitedExciting3"                  
+[106] "HowExcitedNeutral1"                   
+[107] "HowExcitedNeutral2"                   
+[108] "HowExcitedNeutral3"                   
+[109] "HowPleasantAngry1"                    
+[110] "HowPleasantAngry2"                    
+[111] "HowPleasantAngry3"                    
+[112] "HowPleasantExciting1"                 
+[113] "HowPleasantExciting2"                 
+[114] "HowPleasantExciting3"                 
+[115] "HowPleasantNeutral1"                  
+[116] "HowPleasantNeutral2"                  
+[117] "HowPleasantNeutral3"                  
+[118] "MusicRatingEnd"                       
+[119] "MusicRatingInstrx"                    
+[120] "WhichGames"                           
+[121] "aboutyou"                             
+[122] "age"                                  
+[123] "distractions"                         
+[124] "endinstructions"                      
+[125] "ethnicity"                            
+[126] "overlooking"                          
+[127] "race"                                 
+[128] "sex"                                  
+[129] "whatabout"                            
+[130] "year"                                 
+[131] "Subject3"                             
+[132] "DDNoMusicLevel"                       
+[133] "DDNoMusicScore"                       
+[134] "DDMusicLevel"                         
+[135] "DDMusicScore"                         
+[136] "SOFNoMusicEnemies"                    
+[137] "SOFNoMusicFriendlies"                 
+[138] "SOFNoMusicTime"                       
+[139] "SOFMusicEnemies"                      
+[140] "SOFMusicFriendlies"                   
+[141] "SOFMusicTime"                         
+[142] "GameComments"                         
+[143] "DoNotUseVideoGamePerformanceData"     
+[144] "ConfrontationalAngryMusicScore"       
+[145] "ConfrontationalExcitingMusicScore"    
+[146] "ConfrontationalNeutralMusicScore"     
+[147] "ConfrontationalAngryRecallScore"      
+[148] "ConfrontationalExcitingRecallScore"   
+[149] "ConfrontationalNeutralRecallScore"    
+[150] "NonconfrontationalAngryMusicScore"    
+[151] "NonconfrontationalExcitingMusicScore" 
+[152] "NonconfrontationalNeutralMusicScore"  
+[153] "NonconfrontationalAngryRecallScore"   
+[154] "NonconfrontationalExcitingRecallScore"
+[155] "NonconfrontationalNeutralRecallScore" 
+[156] "ConfrontationalAngerScore"            
+[157] "ConfrontationalExcitingScore"         
+[158] "ConfrontationalNeutralScore"          
+[159] "NonconfrontationalAngerScore"         
+[160] "NonconfrontationalExcitingScore"      
+[161] "NonconfrontationalNeutralScore"       
+[162] "Usable"                               
+[163] "DoNotUse"                             
+[164] "ProblemDetails"                       
+[165] "DinerDashWithMusicScore"              
+[166] "DinerDashWithoutMusicScore"           
+[167] "MusicCondition"                       
+[168] "ZDinerDashWithMusicScore"             
+[169] "ZDinerDashWithoutMusicScore"          
+[170] "ZSOFNoMusicEnemies"                   
+[171] "ZSOFMusicEnemies"                     
+[172] "DinerDashDifferenceScore"             
+[173] "SOFDifferenceScore"                   
+[174] "PleasantScoreForAngryMusic"           
+[175] "PleasantScoreForExcitingMusic"        
+[176] "PleasantScoreForNeutralMusic"         
+[177] "AngryScoreForAngryMusic"              
+[178] "AngryScoreForExcitingMusic"           
+[179] "AngryScoreForNeutralMusic"            
+[180] "ExcitedScoreForExcitingMusic"         
+[181] "ExcitedScoreForNeutralMusic"          
+[182] "ActiveScoreForExcitingMusic"          
+[183] "ActiveScoreForNeutralMusic"           
+[184] "ExcitedScoreForAngryMusic"            
+[185] "ActiveScoreForAngryMusic"             </code></pre>
+</div>
+</div>
+<p>And see if you can figure out what range the likert scores are in. What’s the highest number on the likert scale, and what’s the lowest? (Hint, <code>d$Game1Angry1</code> is one of the likert rating columns, and you may want to use <code>unique</code>)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## your code here</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(<span class="fu">unique</span>(d<span class="sc">$</span>Game1Angry1), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">min</span>(<span class="fu">unique</span>(d<span class="sc">$</span>Game1Angry1), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1</code></pre>
+</div>
+</div>
+<p>Highest number: 7 Lowest number: 7</p>
+</section>
+<section id="cleaning-up-a-bit" class="level1">
+<h1>cleaning up a bit</h1>
+<p>First, we’ll get rid of rows and columns of the data that we don’t need.</p>
+<section id="filter-out-excluded-rows" class="level2">
+<h2 class="anchored" data-anchor-id="filter-out-excluded-rows">filter out excluded rows</h2>
+<p>First, we need to <code>filter</code> out any rows that should be excluded. According to the report, there are two exclusions:</p>
+<blockquote class="blockquote">
+<blockquote class="blockquote">
+<p>“exclude data from participant 2 and participant 23 participant 2 is female, and this is a males only study participant 23 was set up on part 2 of the study (the music ratings) twice and never did part 1”</p>
+</blockquote>
+</blockquote>
+<p>You can see participant 23’s data and the fact that they did not do part 1 by looking at the last rows of the dataframe:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Subject Cond                                                    Exper
+86      87    1 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part1.exp
+87      88    6 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part1.exp
+88      89    2 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part1.exp
+89      90    3 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part1.exp
+90      23   NA                                                         
+91      23   NA                                                         
+       Inifile        Date  Time Game1Angry1 Game1Angry2 Game1Angry3
+86 default.mlp 13644633600 40065           1           3           4
+87 default.mlp 13644633600 51237           7           7           5
+88 default.mlp 13644633600 54293           7           6           6
+89 default.mlp 13644633600 58190           5           5           5
+90                      NA    NA          NA          NA          NA
+91                      NA    NA          NA          NA          NA
+   Game1AngryFriends Game1AngryStrangers Game1CalmFriends Game1CalmStrangers
+86                 6                   7                1                  1
+87                 4                   1                4                  4
+88                 7                   5                3                  2
+89                 7                   7                1                  1
+90                NA                  NA               NA                 NA
+91                NA                  NA               NA                 NA
+   Game1ExcitedFriends Game1ExcitedStrangers Game1Exciting1 Game1Exciting2
+86                   1                     1              1              1
+87                   7                     4              7              7
+88                   7                     6              3              5
+89                   4                     1              1              1
+90                  NA                    NA             NA             NA
+91                  NA                    NA             NA             NA
+   Game1Exciting3 Game1Intro Game1Neutral1 Game1Neutral2 Game1Neutral3
+86              1         ok             2             2             3
+87              6         ok             2             1             1
+88              2         ok             1             2             1
+89              1         ok             1             1             6
+90             NA                       NA            NA            NA
+91             NA                       NA            NA            NA
+   Game2Angry1 Game2Angry2 Game2Angry3 Game2AngryFriends Game2AngryStrangers
+86           5           5           7                 1                   7
+87           7           7           4                 1                   1
+88           6           4           6                 7                   2
+89           5           1           7                 7                   7
+90          NA          NA          NA                NA                  NA
+91          NA          NA          NA                NA                  NA
+   Game2CalmFriends Game2CalmStrangers Game2ExcitedFriends
+86                4                  4                   2
+87                5                  6                   7
+88                3                  1                   7
+89                1                  1                   1
+90               NA                 NA                  NA
+91               NA                 NA                  NA
+   Game2ExcitedStrangers Game2Exciting1 Game2Exciting2 Game2Exciting3
+86                     2              5              1              1
+87                     4              7              1              1
+88                     5              1              3              1
+89                     4              3              2              2
+90                    NA             NA             NA             NA
+91                    NA             NA             NA             NA
+   Game2Intro Game2Neutral1 Game2Neutral2 Game2Neutral3 Game3Angry1 Game3Angry2
+86         ok             1             1             1           5           3
+87         ok             1             1             1           2           1
+88         ok             1             2             2           2           4
+89         ok             1             3             1           1           1
+90                       NA            NA            NA          NA          NA
+91                       NA            NA            NA          NA          NA
+   Game3Angry3 Game3AngryFriends Game3AngryStrangers Game3CalmFriends
+86           6                 1                   2                5
+87           7                 1                   1                7
+88           4                 1                   1                6
+89           5                 2                   2                7
+90          NA                NA                  NA               NA
+91          NA                NA                  NA               NA
+   Game3CalmStrangers Game3ExcitedFriends Game3ExcitedStrangers Game3Exciting1
+86                  6                   4                     2              1
+87                  2                   7                     3              2
+88                  4                   3                     6              5
+89                  6                   7                     7              2
+90                 NA                  NA                    NA             NA
+91                 NA                  NA                    NA             NA
+   Game3Exciting2 Game3Exciting3 Game3Intro Game3Neutral1 Game3Neutral2
+86              1              1         ok             5             1
+87              1              1         ok             4             6
+88              5              6         ok             4             1
+89              1              1         ok             4             4
+90             NA             NA                       NA            NA
+91             NA             NA                       NA            NA
+   Game3Neutral3 Game4Angry1 Game4Angry2 Game4Angry3 Game4AngryFriends
+86             2           3           1           4                 1
+87             2           2           1           7                 3
+88             6           1           1           1                 1
+89             7           1           3           1                 3
+90            NA          NA          NA          NA                NA
+91            NA          NA          NA          NA                NA
+   Game4AngryStrangers Game4CalmFriends Game4CalmStrangers Game4ExcitedFriends
+86                   1                7                  7                   7
+87                   4                2                  6                   7
+88                   1                7                  5                   7
+89                   3                5                  4                   7
+90                  NA               NA                 NA                  NA
+91                  NA               NA                 NA                  NA
+   Game4ExcitedStrangers Game4Exciting1 Game4Exciting2 Game4Exciting3
+86                     7              2              5              5
+87                     7              4              1              2
+88                     5              5              4              7
+89                     7              2              4              5
+90                    NA             NA             NA             NA
+91                    NA             NA             NA             NA
+   Game4Intro Game4Neutral1 Game4Neutral2 Game4Neutral3 MusicSelectionEnd
+86         ok             5             5             4                ok
+87         ok             5             3             1                ok
+88         ok             5             5             3                ok
+89         ok             1             2             5                ok
+90                       NA            NA            NA                  
+91                       NA            NA            NA                  
+   MusicSelectionInstrx RecallSelectionEnd RecallSelectionInstrx Subject2 Cond2
+86                   ok                 ok                    ok       87     1
+87                   ok                 ok                    ok       88     6
+88                   ok                 ok                    ok       89     2
+89                   ok                 ok                    ok       90     3
+90                                                                     23     1
+91                                                                     23     1
+                                                    Exper_A   Inifile_A
+86 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part2.exp default.mlp
+87 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part2.exp default.mlp
+88 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part2.exp default.mlp
+89 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part2.exp default.mlp
+90 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part2.exp default.mlp
+91 C:\\Users\\msplab\\Desktop\\Study 151\\Study151Part2.exp default.mlp
+        Date_A Time_A DescribeMusic HowActiveAngry1 HowActiveAngry2
+86 13644633600  42314             2               5               5
+87 13644633600  53402             2               5               5
+88 13644633600  56552             2               5               3
+89 13644633600  60558             2               5               5
+90 13643078400  61329             2               4               5
+91 13643078400  63502             2               4               3
+   HowActiveAngry3 HowActiveExciting1 HowActiveExciting2 HowActiveExciting3
+86               4                  5                  5                  5
+87               5                  5                  5                  5
+88               4                  4                  5                  5
+89               3                  5                  5                  5
+90               5                  3                  3                  3
+91               5                  4                  3                  5
+   HowActiveNeutral1 HowActiveNeutral2 HowActiveNeutral3 HowAngryAngry1
+86                 1                 1                 1              3
+87                 2                 2                 1              5
+88                 1                 2                 1              5
+89                 1                 1                 1              5
+90                 3                 4                 3              3
+91                 4                 4                 2              2
+   HowAngryAngry2 HowAngryAngry3 HowAngryExciting1 HowAngryExciting2
+86              5              1                 1                 1
+87              5              1                 3                 1
+88              5              4                 2                 3
+89              5              3                 3                 1
+90              3              2                 3                 2
+91              3              2                 3                 3
+   HowAngryExciting3 HowAngryNeutral1 HowAngryNeutral2 HowAngryNeutral3
+86                 1                1                5                1
+87                 2                1                1                1
+88                 1                1                1                1
+89                 1                1                1                1
+90                 2                2                2                2
+91                 1                2                2                1
+   HowExcitedAngry1 HowExcitedAngry2 HowExcitedAngry3 HowExcitedExciting1
+86                4                4                4                   3
+87                5                5                5                   5
+88                5                5                4                   3
+89                5                5                5                   4
+90                4                4                5                   5
+91                3                3                3                   3
+   HowExcitedExciting2 HowExcitedExciting3 HowExcitedNeutral1
+86                   4                   4                  1
+87                   5                   5                  1
+88                   4                   5                  2
+89                   5                   4                  1
+90                   5                   3                  3
+91                   5                   4                  3
+   HowExcitedNeutral2 HowExcitedNeutral3 HowPleasantAngry1 HowPleasantAngry2
+86                  2                  1                 3                 3
+87                  5                  5                 1                 1
+88                  2                  1                 3                 3
+89                  1                  2                 2                 1
+90                  4                  4                 1                 1
+91                  4                  3                 2                 2
+   HowPleasantAngry3 HowPleasantExciting1 HowPleasantExciting2
+86                 4                    2                    4
+87                 5                    5                    5
+88                 2                    3                    3
+89                 3                    1                    5
+90                 1                    1                    2
+91                 1                    2                    5
+   HowPleasantExciting3 HowPleasantNeutral1 HowPleasantNeutral2
+86                    3                   3                   3
+87                    2                   5                   5
+88                    5                   4                   4
+89                    2                   4                   4
+90                    1                   3                   3
+91                    3                   5                   5
+   HowPleasantNeutral3 MusicRatingEnd MusicRatingInstrx WhichGames aboutyou age
+86                   2             ok                ok         ok       ok  20
+87                   5             ok                ok         ok       ok  18
+88                   5             ok                ok         ok       ok  18
+89                   5             ok                ok         ok       ok  18
+90                   3             ok                ok         ok       ok  20
+91                   1             ok                ok         ok       ok  20
+   distractions endinstructions ethnicity overlooking race sex whatabout year
+86           ok              ok         2          ok    2   1        ok    2
+87           ok              ok         2          ok    1   1        ok    1
+88           ok              ok         2          ok    2   1        ok    1
+89           ok              ok         2          ok    2   1        ok    1
+90           ok              ok         2          ok    1   1        ok    2
+91           ok              ok         2          ok    1   1        ok    2
+   Subject3 DDNoMusicLevel DDNoMusicScore DDMusicLevel DDMusicScore
+86       87              3              0            3          170
+87       88              3              0            3          866
+88       89              2           3280            3          820
+89       90              2           3040            3            0
+90       23              2           3990            3          750
+91       23             NA             NA           NA           NA
+   SOFNoMusicEnemies SOFNoMusicFriendlies SOFNoMusicTime SOFMusicEnemies
+86                15                    0          13140              25
+87                24                    0          23460              27
+88                 7                    0           8880              31
+89                22                    2          28440              26
+90                 9                    2          19260              18
+91                NA                   NA             NA              NA
+   SOFMusicFriendlies SOFMusicTime                           GameComments
+86                  1        23160 Participant died, restart             
+87                  0        22380                                       
+88                  0        23100                                       
+89                  0        25500                                       
+90                  2        24120                                       
+91                 NA           NA                                       
+   DoNotUseVideoGamePerformanceData ConfrontationalAngryMusicScore
+86                                1                       4.166667
+87                               NA                       6.166667
+88                                1                       5.833333
+89                               NA                       4.666667
+90                               NA                             NA
+91                               NA                             NA
+   ConfrontationalExcitingMusicScore ConfrontationalNeutralMusicScore
+86                          1.666667                         1.666667
+87                          4.833333                         1.166667
+88                          2.500000                         1.500000
+89                          1.666667                         2.166667
+90                                NA                               NA
+91                                NA                               NA
+   ConfrontationalAngryRecallScore ConfrontationalExcitingRecallScore
+86                            6.50                               1.25
+87                            2.50                               5.50
+88                            5.25                               6.25
+89                            7.00                               3.25
+90                              NA                                 NA
+91                              NA                                 NA
+   ConfrontationalNeutralRecallScore NonconfrontationalAngryMusicScore
+86                              1.75                          3.666667
+87                              4.50                          3.333333
+88                              2.25                          2.166667
+89                              1.00                          2.000000
+90                                NA                                NA
+91                                NA                                NA
+   NonconfrontationalExcitingMusicScore NonconfrontationalNeutralMusicScore
+86                             2.500000                            3.666667
+87                             1.833333                            3.500000
+88                             5.333333                            4.000000
+89                             2.500000                            3.833333
+90                                   NA                                  NA
+91                                   NA                                  NA
+   NonconfrontationalAngryRecallScore NonconfrontationalExcitingRecallScore
+86                               1.25                                  4.25
+87                               1.75                                  6.00
+88                               1.00                                  4.25
+89                               2.25                                  7.00
+90                                 NA                                    NA
+91                                 NA                                    NA
+   NonconfrontationalNeutralRecallScore ConfrontationalAngerScore
+86                                 5.75                       5.1
+87                                 5.50                       4.7
+88                                 5.25                       5.6
+89                                 6.00                       5.6
+90                                   NA                        NA
+91                                   NA                        NA
+   ConfrontationalExcitingScore ConfrontationalNeutralScore
+86                          1.5                         1.7
+87                          5.1                         2.5
+88                          4.0                         1.8
+89                          2.3                         1.7
+90                           NA                          NA
+91                           NA                          NA
+   NonconfrontationalAngerScore NonconfrontationalExcitingScore
+86                          2.7                             3.2
+87                          2.7                             3.5
+88                          1.7                             4.9
+89                          2.1                             4.3
+90                           NA                              NA
+91                           NA                              NA
+   NonconfrontationalNeutralScore Usable DoNotUse
+86                            4.5      1       NA
+87                            4.3      1       NA
+88                            4.5      1       NA
+89                            4.7      1       NA
+90                             NA      0        1
+91                             NA      0        1
+                                                                                                                                                                                             ProblemDetails
+86                                                                                                                                                                                                         
+87                                                                                                                                                                                                         
+88                                                                                                                                                                                                         
+89                                                                                                                                                                                                         
+90 Participant 23 was set up on part 2 of the survey when he was supposed to be set up on part 1; he did part 2 twice; data should be excluded entirely                                                    
+91 Participant 23 was set up on part 2 of the survey when he was supposed to be set up on part 1; he did part 2 twice; data should be excluded entirely                                                    
+   DinerDashWithMusicScore DinerDashWithoutMusicScore MusicCondition
+86                    5170                       5000          Anger
+87                    5866                       5000        Neutral
+88                    5820                       3280       Exciting
+89                    5000                       3040        Neutral
+90                    5750                       3990           &lt;NA&gt;
+91                      NA                         NA           &lt;NA&gt;
+   ZDinerDashWithMusicScore ZDinerDashWithoutMusicScore ZSOFNoMusicEnemies
+86              -1.02044667                   0.2692740         -0.1401958
+87              -0.02167208                   0.2692740          1.0044959
+88              -0.08768304                  -1.1667773         -1.1576995
+89              -1.26440023                  -1.3671565          0.7501199
+90              -0.18813451                  -0.5739887         -0.9033236
+91                       NA                          NA                 NA
+   ZSOFMusicEnemies DinerDashDifferenceScore SOFDifferenceScore
+86        0.5785486               -1.2897207         0.71874445
+87        0.8387424               -0.2909461        -0.16575340
+88        1.3591301                1.0790942         2.51682964
+89        0.7086455                0.1027563        -0.04147439
+90       -0.3321298                0.3858541         0.57119384
+91               NA                       NA                 NA
+   PleasantScoreForAngryMusic PleasantScoreForExcitingMusic
+86                   3.333333                      3.000000
+87                   2.333333                      4.000000
+88                   2.666667                      3.666667
+89                   2.000000                      2.666667
+90                   1.000000                      1.333333
+91                   1.666667                      3.333333
+   PleasantScoreForNeutralMusic AngryScoreForAngryMusic
+86                     2.666667                3.000000
+87                     5.000000                3.666667
+88                     4.333333                4.666667
+89                     4.333333                4.333333
+90                     3.000000                2.666667
+91                     3.666667                2.333333
+   AngryScoreForExcitingMusic AngryScoreForNeutralMusic
+86                   1.000000                  2.333333
+87                   2.000000                  1.000000
+88                   2.000000                  1.000000
+89                   1.666667                  1.000000
+90                   2.333333                  2.000000
+91                   2.333333                  1.666667
+   ExcitedScoreForExcitingMusic ExcitedScoreForNeutralMusic
+86                     3.666667                    1.333333
+87                     5.000000                    3.666667
+88                     4.000000                    1.666667
+89                     4.333333                    1.333333
+90                     4.333333                    3.666667
+91                     4.000000                    3.333333
+   ActiveScoreForExcitingMusic ActiveScoreForNeutralMusic
+86                    5.000000                   1.000000
+87                    5.000000                   1.666667
+88                    4.666667                   1.333333
+89                    5.000000                   1.000000
+90                    3.000000                   3.333333
+91                    4.000000                   3.333333
+   ExcitedScoreForAngryMusic ActiveScoreForAngryMusic
+86                  4.000000                 4.666667
+87                  5.000000                 5.000000
+88                  4.666667                 4.000000
+89                  5.000000                 4.333333
+90                  4.333333                 4.666667
+91                  3.000000                 4.000000</code></pre>
+</div>
+</div>
+<p>Notice that participant 23 has missing values for part 1.</p>
+<p>The researchers have made a column called <code>DoNotUse</code> based on their exclusion criteria. Use this column to filter the dataframe! Try running this code</p>
+<p>Hint: enter <code>?dplyr::filter</code> into the console to check the documentation. What happens to na values?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>filtered_d <span class="ot">=</span> d <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(DoNotUse))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># your code here: exclude subjects that are marked as "DoNotUse"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>It’s good practice to assign a new variable name (in this case <code>filtered_d</code>) to a data frame when you change it in an important way, or apply a code chunk that shouldn’t be run twice. This helps prevent you seeing different results when you run your code in chunks (and might run one multiple times, or skip it, etc.) vs.&nbsp;knit the document.</p>
+</section>
+<section id="get-rid-of-unnecessary-columns" class="level2">
+<h2 class="anchored" data-anchor-id="get-rid-of-unnecessary-columns">Get rid of unnecessary columns</h2>
+<p>The dataset contains a bunch of columns we don’t care about: * The dataset contains three subject columns, which are identical except for a single NA which is not mentioned in the protocol, and so is likely an error. * Columns telling us the path to the executable run for each part of the experiment, we don’t really care about that. * Etc.</p>
+<p>To get rid of these, we’ll use the <code>select</code> function to take only the columns we need.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>filtered_d <span class="ot">=</span> filtered_d <span class="sc">|&gt;</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="st">"Subject"</span>, <span class="st">"Cond"</span>), <span class="co"># Generally important columns for both hypotheses</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>         <span class="fu">contains</span>(<span class="st">"Game"</span>), <span class="co"># we want all the game columns for hypothesis 1</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span><span class="fu">contains</span>(<span class="st">"Intro"</span>), <span class="sc">-</span><span class="fu">c</span>(<span class="st">"WhichGames"</span>, <span class="st">"GameComments"</span>), <span class="co"># except these</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>         <span class="fu">starts_with</span>(<span class="st">"DinerDashWith"</span>), <span class="fu">c</span>(<span class="st">"SOFMusicEnemies"</span>, <span class="st">"SOFNoMusicEnemies"</span>)) <span class="co"># These columns are for hypothesis 2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Even better, let’s split this into separate data frames for hypothesis 1 and hypothesis 2, since they are different types of experiments with different measurements, and therefore different analyses that will need to be performed. Now that we’ve cleaned up the data, this is pretty easy to do! We’ll just drop the columns that are for the other hypothesis. The <code>select</code> function lets us choose which columns to remove (instead of which to keep) by putting a minus sign in front of them. First, let’s create a dataset for the rating hypothesis by getting rid of the game performance columns:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>rating_hyp_d <span class="ot">=</span> filtered_d <span class="sc">|&gt;</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(DoNotUseVideoGamePerformanceData)) <span class="sc">%&gt;%</span> <span class="co"># first, let's get rid of the subjects who did so poorly on one game that their data is unusable</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>DoNotUseVideoGamePerformanceData, <span class="co"># now get rid of that column</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span><span class="fu">starts_with</span>(<span class="st">"DinerDash"</span>), <span class="co"># and the other columns we don't need</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span><span class="fu">starts_with</span>(<span class="st">"SOF"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now you try! Fill in the selection criteria to get rid of the “Game” columns, which we don’t need for the performance hypothesis. (It’s simpler than the code block above, because you don’t need to do a <code>filter</code> first, only a <code>select</code>.)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>performance_hyp_d <span class="ot">=</span> filtered_d <span class="sc">|&gt;</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(DoNotUseVideoGamePerformanceData)) <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>DoNotUseVideoGamePerformanceData,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span><span class="fu">starts_with</span>(<span class="st">"Game"</span>)) <span class="co"># your code here: remove the columns containing "Game" in the name</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="converting-to-long-form" class="level1">
+<h1>Converting to long form</h1>
+<p>Now we want to convert the data to long form, to make the rest of our manipulations easier. To do this, we can use <code>pivot_longer</code> on the target columns. This will take many columns, and change the column names into entries in a “key” column, while the values that were in the original column will be turned into entries in a “value” column. It’s easiest to see with an example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>tiny_demo_d <span class="ot">=</span> <span class="fu">head</span>(performance_hyp_d, <span class="dv">2</span>) <span class="co"># get just the first two subjects performance data, for a demo</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>First, take a look at the original wide-form data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>tiny_demo_d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Subject Cond DinerDashWithMusicScore DinerDashWithoutMusicScore
+1       1    2                    5830                       5000
+2       3    1                    5370                       1250
+  SOFMusicEnemies SOFNoMusicEnemies
+1              19                22
+2              23                15</code></pre>
+</div>
+</div>
+<p>Now, take a look at the long-form version:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>tiny_demo_d <span class="sc">|&gt;</span> <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="sc">-</span><span class="fu">c</span>(<span class="st">"Subject"</span>, <span class="st">"Cond"</span>), <span class="co"># this tells it to transform all columns *except* these ones</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">names_to=</span><span class="st">'Measurement'</span>, </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">values_to=</span><span class="st">'Value'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 4
+  Subject  Cond Measurement                Value
+    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                      &lt;dbl&gt;
+1       1     2 DinerDashWithMusicScore     5830
+2       1     2 DinerDashWithoutMusicScore  5000
+3       1     2 SOFMusicEnemies               19
+4       1     2 SOFNoMusicEnemies             22
+5       3     1 DinerDashWithMusicScore     5370
+6       3     1 DinerDashWithoutMusicScore  1250
+7       3     1 SOFMusicEnemies               23
+8       3     1 SOFNoMusicEnemies             15</code></pre>
+</div>
+</div>
+<p>See how the columns have been converted into rows (except for the two we excluded), and the dataset has gone from wide to long?</p>
+<p>Now let’s actually convert the performance dataset</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>performance_hyp_long_d <span class="ot">=</span> performance_hyp_d <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="sc">-</span><span class="fu">c</span>(<span class="st">"Subject"</span>, <span class="st">"Cond"</span>),</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to=</span><span class="st">'Measurement'</span>, </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to=</span><span class="st">'Score'</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(performance_hyp_long_d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  Subject  Cond Measurement                Score
+    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                      &lt;dbl&gt;
+1       1     2 DinerDashWithMusicScore     5830
+2       1     2 DinerDashWithoutMusicScore  5000
+3       1     2 SOFMusicEnemies               19
+4       1     2 SOFNoMusicEnemies             22
+5       3     1 DinerDashWithMusicScore     5370
+6       3     1 DinerDashWithoutMusicScore  1250</code></pre>
+</div>
+</div>
+<p>And you can convert the rating dataset! (Call the “Key” column “Measurement” and call the “Value” column “Rating”, so that the code below will work)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>rating_hyp_long_d <span class="ot">=</span> rating_hyp_d <span class="sc">|&gt;</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="sc">-</span><span class="fu">c</span>(<span class="st">"Subject"</span>, <span class="st">"Cond"</span>),</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to=</span><span class="st">'Measurement'</span>, </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to=</span><span class="st">'Rating'</span>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(rating_hyp_long_d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  Subject  Cond Measurement         Rating
+    &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                &lt;dbl&gt;
+1       1     2 Game1Angry1              6
+2       1     2 Game1Angry2              6
+3       1     2 Game1Angry3              5
+4       1     2 Game1AngryFriends        2
+5       1     2 Game1AngryStrangers      5
+6       1     2 Game1CalmFriends         2</code></pre>
+</div>
+</div>
+</section>
+<section id="splitting-columns" class="level1">
+<h1>Splitting columns</h1>
+<p>The measurement column in each dataset now contains a bunch of different types of information. Really, we would like these to be separate columns. For example, we could have one column telling you which video-game it is, and one telling you whether there was music. Tidyverse contains some handy features for splitting columns, but unfortunately the measurement names here are not well suited to it (if the different types of information were always the same length, or were separated by a symbol like “.” or “_“, it would be easy). Thus we’ll have to do a bit of manual testing. We can use the <code>mutate</code> function in dplyr to create new columns as functions of old ones (or alter existing columns). We’ll also use the <code>grepl</code> function, which lets us test whether a <em>regular expression</em> (a fancy type of search pattern) is contained in a column name. For most your purposes, you can probably just use grepl to search for strings, but there are some other quite useful functions in regular expressions, like the”or”” function (<code>|</code>) we use below.</p>
+<p>But first, a quick tiny demo about how mutate generally works:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>tiny_demo_mutate <span class="ot">&lt;-</span> <span class="fu">head</span>(performance_hyp_long_d, <span class="dv">10</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>tiny_demo_mutate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 4
+   Subject  Cond Measurement                Score
+     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;                      &lt;dbl&gt;
+ 1       1     2 DinerDashWithMusicScore     5830
+ 2       1     2 DinerDashWithoutMusicScore  5000
+ 3       1     2 SOFMusicEnemies               19
+ 4       1     2 SOFNoMusicEnemies             22
+ 5       3     1 DinerDashWithMusicScore     5370
+ 6       3     1 DinerDashWithoutMusicScore  1250
+ 7       3     1 SOFMusicEnemies               23
+ 8       3     1 SOFNoMusicEnemies             15
+ 9       6     6 DinerDashWithMusicScore     6380
+10       6     6 DinerDashWithoutMusicScore  5840</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>tiny_demo_mutate <span class="ot">=</span> tiny_demo_mutate <span class="sc">|&gt;</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">score_plus_one =</span> Score <span class="sc">+</span> <span class="dv">1</span>,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">score_minus_one =</span> Score <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Cool, let’s go back to the data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>performance_hyp_long_d <span class="ot">=</span> performance_hyp_long_d <span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># create a new variable that will say whether the measurement was of the game soldier of fortune (SOF).</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">ConfrontationalGame =</span> <span class="fu">grepl</span>(<span class="st">"SOF"</span>, Measurement), </span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># creates a new column named WithMusic, which is False if the measurement contains *either* "NoMusic" or "WithoutMusic"</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">WithMusic =</span> <span class="sc">!</span><span class="fu">grepl</span>(<span class="st">"NoMusic|WithoutMusic"</span>, Measurement),</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get rid of uninterpretable condition labels</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Cond =</span> <span class="fu">ifelse</span>(Cond <span class="sc">&gt;</span> <span class="dv">3</span>, Cond <span class="sc">-</span> <span class="dv">3</span>, Cond),</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get rid of uninterpretable condition labels</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">MusicCondition =</span> <span class="fu">factor</span>(Cond, <span class="at">levels =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Anger"</span>, <span class="st">"Exciting"</span>, <span class="st">"Neutral"</span>))</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>    ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: You can also do steps 3 and 4 (Cond and MusicCondition) in one step with the following:</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co"># MusicCondition = factor(ifelse(Cond &gt; 3, Cond - 3, Cond), </span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                         levels = 1:3, labels = c("Anger", "Exciting", "Neutral"))</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Instead of passing in the already-modified "Cond" column, this changes the Cond values and then uses </span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co"># those changed values to create the Music Condition levels.</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co"># I prefer to go one step at a time for readability and teaching purposes, but I figured I would mention!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now you can help! For the rating dataset, write a test on a measurement name, using <code>grepl</code> or <code>%in%</code> to figure out whether it’s a recall or a music rating. Your new <code>IsRecall</code> column should be true if the measurement name contain either “Friends” or “Strangers”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>rating_hyp_long_d <span class="ot">=</span> rating_hyp_long_d <span class="sc">|&gt;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mutate</span>(</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">IsRecall =</span> <span class="fu">grepl</span>(<span class="st">"Friends|Strangers"</span>, Measurement)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here are a couple other useful ways of manipulating columns. (You won’t remember all the functions you see here now, but that’s okay. You can always reference this tutorial later if there’s something you need to figure out how to do.)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>rating_hyp_long_d <span class="ot">=</span> rating_hyp_long_d <span class="sc">|&gt;</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Pulls out the game number</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">GameNumber =</span> <span class="fu">as.numeric</span>(<span class="fu">substr</span>(rating_hyp_long_d<span class="sc">$</span>Measurement, <span class="dv">5</span>, <span class="dv">5</span>)),</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># We can then use that new GameNumber Column right away</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Games 1 and 2 are confrontational, Games 3 and 4 are not</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">ConfrontationalGame =</span> GameNumber <span class="sc">&lt;=</span> <span class="dv">2</span>, </span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Now that we have added the game number and whether it is confrontational elsewhere,</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># we can just pull out the emotion! Let's do it in two steps:</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Grab the string of emotions</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">Emotion =</span> <span class="fu">str_extract</span>(Measurement, <span class="st">"Angry|Neutral|Excited|Exciting|Calm"</span>),</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Clean up annoying labeling using TWO ifelse statements</span></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The data uses "Excited" and "Exciting" to describe the same music</span></span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Similar with "Calm" and "Neutral"</span></span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Emotion =</span> <span class="fu">ifelse</span>(Emotion <span class="sc">==</span> <span class="st">"Excited"</span>, <span class="st">"Exciting"</span>, </span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>              <span class="fu">ifelse</span>(Emotion <span class="sc">==</span> <span class="st">"Calm"</span>, <span class="st">"Neutral"</span>, Emotion)) </span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>    ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="groups-summaries-and-results" class="level1">
+<h1>Groups, Summaries, and Results</h1>
+<section id="performance-hypothesis" class="level2">
+<h2 class="anchored" data-anchor-id="performance-hypothesis">Performance Hypothesis</h2>
+<p>For the performance data, we need to do a little bit of manipulation of the columns in order to get to the performance measures the experimenters actually used. Because they want to compare changes in performance across games that have very different scoring systems, the easiest solution is to compare z-scores. The way they did this was to z-score performance before music, z-score performance after music, and then create a difference measure which is a difference of z-scores. (To my mind, this is actually not quite the correct way to analyze this data, but like the replication we will follow the original authors.)</p>
+<p>We’ll add a new z-scored value column. However, we have to be careful! We want to z-score within <em>groups</em> of the rows, that are all the same type of measurement. For example, we want to z-score the “DinnerDashWithMusic” scores with respect to eachother, but <strong>not</strong> with respect to the scores from the other game, for example. We can use the <code>group_by</code> function to set groups, and then all the changes we apply will only occur within those groups until we <code>ungroup</code> the dataset.</p>
+<p>To make this more concrete, let’s see how the <code>group_by</code> function can let us compute means within different groups, for example mean scores on the two different games.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>performance_hyp_long_d <span class="sc">|&gt;</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ConfrontationalGame, WithMusic) <span class="sc">|&gt;</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">AvgScore =</span> <span class="fu">mean</span>(Score, <span class="at">na.rm=</span>T)) <span class="co"># the na.rm tells R to ignore NA values</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'ConfrontationalGame'. You can override
+using the `.groups` argument.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+# Groups:   ConfrontationalGame [2]
+  ConfrontationalGame WithMusic AvgScore
+  &lt;lgl&gt;               &lt;lgl&gt;        &lt;dbl&gt;
+1 FALSE               FALSE       4687. 
+2 FALSE               TRUE        5930. 
+3 TRUE                FALSE         20.6
+4 TRUE                TRUE          24.1</code></pre>
+</div>
+</div>
+<p>This makes it clear why we can’t just z-score the games together! The scores are very different between games. So let’s z-score within groups (using the <code>scale</code> function):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>performance_hyp_long_d <span class="ot">=</span> performance_hyp_long_d <span class="sc">|&gt;</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ConfrontationalGame, WithMusic) <span class="sc">|&gt;</span> <span class="co"># we're going to compute four sets of z-scores, one for the confrontational game without music, one for the confrontational game with, one for the nonconfrontational game without music, and one for the nonconfrontational game with</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">z_scored_performance =</span> <span class="fu">scale</span>(Score)) <span class="sc">|&gt;</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="rating-hypothesis" class="level2">
+<h2 class="anchored" data-anchor-id="rating-hypothesis">Rating Hypothesis</h2>
+<p>The rating hypothesis analysis also requires some grouped manipulation. The experimenters collected repeated measures on ratings in each emotion category and each music/recall category from each game. For this analysis, they averaged all the ratings over the following two variables: the given emotion and the game type, to produce a nice summary. Your job is to implement this, calling the new variable MeanRating, and save the summarized data in a new data frame called <code>rating_summary_d</code>. (Hint: use a <code>group_by</code> and a <code>summarize</code>.)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>rating_summary_d <span class="ot">=</span> rating_hyp_long_d <span class="sc">|&gt;</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ConfrontationalGame, Emotion) <span class="sc">|&gt;</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">MeanRating =</span> <span class="fu">mean</span>(Rating, <span class="at">na.rm=</span>T), <span class="at">.groups =</span> <span class="st">'drop'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s take a look at the result:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>rating_summary_d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  ConfrontationalGame Emotion  MeanRating
+  &lt;lgl&gt;               &lt;chr&gt;         &lt;dbl&gt;
+1 FALSE               Angry          2.72
+2 FALSE               Exciting       3.97
+3 FALSE               Neutral        3.68
+4 TRUE                Angry          4.68
+5 TRUE                Exciting       3.05
+6 TRUE                Neutral        2.16</code></pre>
+</div>
+</div>
+<p>And a simple bar plot (don’t worry too much about what exactly this code is doing):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(rating_summary_d, <span class="fu">aes</span>(<span class="at">x=</span>ConfrontationalGame, <span class="at">y=</span>MeanRating, <span class="at">fill=</span>Emotion)) <span class="sc">+</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position=</span><span class="st">"dodge"</span>, <span class="at">stat=</span><span class="st">"identity"</span>) <span class="sc">+</span> </span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette=</span><span class="st">"Set1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ps2-Lawal_files/figure-html/TamirFig1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Up to reordering (and the fact that we didn’t compute error bars), this is a pretty decent replication of Fig. 1 from the original Tamir et al.&nbsp;paper. The ratings were highest for Angry in the confrontational game, and lowest for Angry in the non-confrontational game.</p>
+</section>
+<section id="performance-hypothesis-continued" class="level2">
+<h2 class="anchored" data-anchor-id="performance-hypothesis-continued">Performance Hypothesis (Continued)</h2>
+<p>There are still a few more steps to go for the performance hypothesis. We need to take a difference score to see how people improved from before hearing the music to after, and then see if the improvement is larger if they heard music congruent with the type of game.</p>
+<p>To compute the difference score, we have to make our data a bit wider. We now want to subtract the pre-music scores from the post-music scores, which is easiest to do if they are in two different columns. To do this we’ll use the <code>pivot_wider</code> function (which is more or less the opposite of <code>pivot_longer</code>)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>performance_diff_d <span class="ot">=</span> performance_hyp_long_d <span class="sc">|&gt;</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># re-label variable so code is easier to read</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">WithMusic =</span> <span class="fu">factor</span>(WithMusic, <span class="at">levels=</span><span class="fu">c</span>(F, T), <span class="at">labels=</span><span class="fu">c</span>(<span class="st">"PreMusic"</span>, <span class="st">"PostMusic"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># now we remove columns we don't need (why might this be?)</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">"Score"</span>, <span class="st">"Measurement"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from=</span>WithMusic, </span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from=</span>z_scored_performance) <span class="sc">|&gt;</span></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ImprovementScore=</span>PostMusic<span class="sc">-</span>PreMusic)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s take a look at the end result:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>performance_diff_d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 94 × 7
+   Subject  Cond ConfrontationalGame MusicCondition PostMusic[,1] PreMusic[,1]
+     &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;               &lt;fct&gt;                  &lt;dbl&gt;        &lt;dbl&gt;
+ 1       1     2 FALSE               Exciting             -0.150         0.265
+ 2       1     2 TRUE                Exciting             -1.30          0.317
+ 3       3     1 FALSE               Anger                -0.844        -2.91 
+ 4       3     1 TRUE                Anger                -0.283        -1.29 
+ 5       6     3 FALSE               Neutral               0.679         0.975
+ 6       6     3 TRUE                Neutral              -0.0272        0.546
+ 7       9     2 FALSE               Exciting              0.770         1.50 
+ 8       9     2 TRUE                Exciting             -2.07         -0.599
+ 9      10     1 FALSE               Anger                -0.678        -1.44 
+10      10     1 TRUE                Anger                -0.0272       -1.06 
+# ℹ 84 more rows
+# ℹ 1 more variable: ImprovementScore &lt;dbl[,1]&gt;</code></pre>
+</div>
+</div>
+<p>If you don’t understand every step of that code (or any other <code>dplyr</code> code), it can be helpful to look at the result of running just the first line, then just the first two lines, and so on.</p>
+<p>Now we’re finally to reproduce Fig. 2 from Tamir et al., we just need to get the mean differences within each game and each kind of music, and save them to a variable called <code>MeanImprovementScore</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>performance_summary_d <span class="ot">=</span> performance_diff_d <span class="sc">|&gt;</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ConfrontationalGame, MusicCondition) <span class="sc">|&gt;</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">MeanImprovementScore =</span> <span class="fu">mean</span>(ImprovementScore, <span class="at">na.rm=</span>T), <span class="at">.groups =</span> <span class="st">'drop'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>performance_summary_d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  ConfrontationalGame MusicCondition MeanImprovementScore
+  &lt;lgl&gt;               &lt;fct&gt;                         &lt;dbl&gt;
+1 FALSE               Anger                       -0.0552
+2 FALSE               Exciting                    -0.226 
+3 FALSE               Neutral                      0.310 
+4 TRUE                Anger                        0.348 
+5 TRUE                Exciting                    -0.146 
+6 TRUE                Neutral                     -0.0879</code></pre>
+</div>
+</div>
+<p>and plot it!</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(performance_summary_d, <span class="fu">aes</span>(<span class="at">x=</span>ConfrontationalGame, <span class="at">y=</span>MeanImprovementScore, <span class="at">fill=</span>MusicCondition)) <span class="sc">+</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position=</span><span class="st">"dodge"</span>, <span class="at">stat=</span><span class="st">"identity"</span>) <span class="sc">+</span> </span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette=</span><span class="st">"Set1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ps2-Lawal_files/figure-html/TamirFig2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>(Bonus: also calculate the SEM in the summary data, and then add errorbars to the plot with <code>geom_errorbar</code>!)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>performance_summary_d <span class="ot">=</span> performance_diff_d <span class="sc">|&gt;</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(ConfrontationalGame, MusicCondition) <span class="sc">|&gt;</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">MeanImprovementScore =</span> <span class="fu">mean</span>(ImprovementScore, <span class="at">na.rm=</span>T), <span class="at">sd =</span> <span class="fu">sd</span>(ImprovementScore), <span class="at">n =</span> <span class="fu">n</span>(), <span class="at">se =</span> sd<span class="sc">/</span><span class="fu">sqrt</span>(n), <span class="at">.groups =</span> <span class="st">'drop'</span>)</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(performance_summary_d, <span class="fu">aes</span>(<span class="at">x=</span>ConfrontationalGame, <span class="at">y=</span>MeanImprovementScore, <span class="at">fill=</span>MusicCondition)) <span class="sc">+</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position=</span><span class="st">"dodge"</span>, <span class="at">stat=</span><span class="st">"identity"</span>) <span class="sc">+</span> </span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> MeanImprovementScore <span class="sc">-</span> se, <span class="at">ymax =</span> MeanImprovementScore <span class="sc">+</span> se), <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="fl">0.8</span>), <span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette=</span><span class="st">"Set1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ps2-Lawal_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Not quite as exact a replication of the effect as Fig. 1. This concurs with the <a href="https://osf.io/7i2tf/">replication report</a>, which says that the hypothesis 1 effect replicated, but hypothesis 2 did not.</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
